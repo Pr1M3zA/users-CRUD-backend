@@ -1,0 +1,17 @@
+meta {
+  name: Update user
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:3000/users/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "priscilav.mezal@gmail.com"
+  }
+}
