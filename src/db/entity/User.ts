@@ -18,6 +18,9 @@ export class User {
    @Column("boolean", { default: false, nullable: false })
    isVerified: boolean
 
+   @Column("text", { nullable: false })
+   verificationCode: string
+
    @OneToMany(() => Url, urls => urls.user)
    urls: Url[]
 }

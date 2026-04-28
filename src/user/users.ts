@@ -10,6 +10,8 @@ import deleteUserService from "./services/deleteUserService";
 import getUserByIdService from "./services/getUserByIdService";
 import getAllUsersService from "./services/getAllUsersService";
 import loginService from "./services/loginService";
+import verifyUserService from "./services/verifyUserService";
+import VerificationSchema from "./schema/verificationSchema";
 
 
 const Users = Router();
@@ -46,6 +48,11 @@ Users.get('/:id', async (req: Request, res: Response) => {
 
 Users.post('/login', checkSchema(LoginSchema), validateRequest, async (req: Request, res: Response) => {
    const { status, ...rest } = await loginService(req.body);
+   res.status(status).json(rest);
+});
+
+Users.post('/verify', checkSchema(VerificationSchema), validateRequest, async (req: Request, res: Response) => {
+   const { status, ...rest } = await verifyUserService(req.body);
    res.status(status).json(rest);
 });
 

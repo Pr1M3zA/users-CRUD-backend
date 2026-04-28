@@ -7,3 +7,5 @@ export type SafeUser = Omit<User, "password">;
 export type CreateUserDTO = Pick<User, "name" | "email" | "password">;
 
 export type UpdateUserDTO = Partial<CreateUserDTO>;
+
+export type VerifyUserDTO = Pick<User, "email" | "verificationCode">;
