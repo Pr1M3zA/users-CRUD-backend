@@ -7,11 +7,11 @@ const CreateUrlSchema: Schema = {
       optional: false,
       errorMessage: "originalUrl is required and must be a valid URL"
    },
-   email: {
-      in: "body",
-      isEmail: true,
+   authorization: {
+      in: "headers",
+      isString: true,
       optional: false,
-      errorMessage: "email is required and must be a valid email address"
+      errorMessage: "Authorization is required and must be a valid token"
    },
 };
 

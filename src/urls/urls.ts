@@ -10,21 +10,21 @@ const Urls = Router();
 Urls.use(json());
 
 Urls.post('/', checkSchema(CreateUrlSchema), validateRequest, async (req: Request, res: Response) => {
-   const { status, ...rest } = await createUrlService(req.body);
+   const { status, ...rest } = await createUrlService({ token: req.headers.authorization as string, originalUrl: req.body.originalUrl });
    res.status(status).json(rest.data?.shortUrl || rest);
 });
 
 // Activar URL
 Urls.put('/activate/:id', async (req: Request, res: Response) => {
    const { id } = req.params;
-   const { status, ...rest } = await updateUrlService({ id: Number(id), data: { isActive: true } });
+   const { status, ...rest } = await updateUrlService({ id: Number(id), data: { isActive: true }, token: req.headers.authorization as string });
    res.status(status).json(rest);
 });
 
 // Desactirar URL
 Urls.put('/deactivate/:id', async (req: Request, res: Response) => {
    const { id } = req.params;
-   const { status, ...rest } = await updateUrlService({ id: Number(id), data: { isActive: false } });
+   const { status, ...rest } = await updateUrlService({ id: Number(id), data: { isActive: false }, token: req.headers.authorization as string });
    res.status(status).json(rest);
 });
 

@@ -28,15 +28,13 @@ Users.post('/', checkSchema(createUserSchema), validateRequest, async (req: Requ
    res.status(status).json(rest);
 });
 
-Users.put('/:id', checkSchema(updateUserSchema), validateRequest, async (req: Request, res: Response) => {
-   const { id } = req.params;
-   const { status, ...rest } = await updateUserService({ id: Number(id), ...req.body });
+Users.put('/', checkSchema(updateUserSchema), validateRequest, async (req: Request, res: Response) => {
+   const { status, ...rest } = await updateUserService({ token: req.headers.authorization as string, data: req.body });
    res.status(status).json(rest);
 });
 
-Users.delete('/:id', async (req: Request, res: Response) => {
-   const { id } = req.params;
-   const { status, ...rest } = await deleteUserService({ id: Number(id) });
+Users.delete('/', async (req: Request, res: Response) => {
+   const { status, ...rest } = await deleteUserService({ token: req.headers.authorization as string });
    res.status(status).json(rest);
 });
 

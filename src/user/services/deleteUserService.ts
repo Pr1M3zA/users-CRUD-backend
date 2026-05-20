@@ -1,9 +1,13 @@
 import { ServiceWithProps } from "../../utils/types";
 import UserDAL from "../DAL/userDAL";
+import { validateSessionJwt } from "../../utils/jwt";
 
-const deleteUserService: ServiceWithProps<null, { id: number }> = async ({ id }) => {
+const deleteUserService: ServiceWithProps<null, { token: string }> = async ({ token }) => {
    try {
-      const userToRemove = await UserDAL.findOneBy({ id });
+      const tokenPayload = validateSessionJwt(token);
+      if (!tokenPayload) return { message: "Invalid token", status: 401 };
+
+      const userToRemove = await UserDAL.findOneBy({ id: tokenPayload.id });
       if (!userToRemove) return { message: "User not found", status: 404 };
       await UserDAL.remove(userToRemove);
       return { message: "User deleted successfully", status: 200 };

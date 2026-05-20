@@ -2,10 +2,14 @@ import { ServiceWithProps } from "../../utils/types";
 import UserDAL from "../DAL/userDAL";
 import { User, CreateUserDTO, SafeUser, UpdateUserDTO } from "../types/User";
 import { generatePasswordHash } from "../../utils/password";
+import { validateSessionJwt } from "../../utils/jwt";
 
-const updateUserService: ServiceWithProps<SafeUser, { id: number; data: UpdateUserDTO }> = async ({ id, data }) => {
+const updateUserService: ServiceWithProps<SafeUser, { token: string; data: UpdateUserDTO}> = async ({ token, data }) => {
    try {
-      const userToUpdate = await UserDAL.findOneBy({ id });
+      const tokenPayload = validateSessionJwt(token);
+      if (!tokenPayload) return { message: "Invalid token", status: 401 };
+
+      const userToUpdate = await UserDAL.findOneBy({ id: tokenPayload.id });
       if (!userToUpdate) return { message: "User not found", status: 404 };
       if (data.password) data.password = await generatePasswordHash(data.password);
 

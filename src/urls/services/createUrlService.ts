@@ -3,10 +3,13 @@ import UrlDAL from "../DAL/urlDAL";
 import UserDAL from "../../user/DAL/userDAL";
 import { Url } from "../types/Url";
 import bcrypt from "bcrypt";
+import { validateSessionJwt } from "../../utils/jwt";
 
-const createUrlService: ServiceWithProps<Url, { email: string; originalUrl: string }> = async (data) => {
+const createUrlService: ServiceWithProps<Url, { token: string; originalUrl: string }> = async ({ token, originalUrl }) => {
    try {
-      const user = await UserDAL.findOneBy({ email: data.email });
+      const tokenPayload = validateSessionJwt(token);
+      if (!tokenPayload) return { message: "Invalid token", status: 401 };
+      const user = await UserDAL.findOneBy({ id: tokenPayload.id });
       if (!user) return { message: "User not found", status: 404 };
 
       let shortUrl = "";
@@ -14,7 +17,7 @@ const createUrlService: ServiceWithProps<Url, { email: string; originalUrl: stri
       let attempts = 0;
 
       while (!isUnique && attempts < 10) {
-         const hash = await bcrypt.hash(data.originalUrl + Date.now().toString() + attempts, 10);
+         const hash = await bcrypt.hash(originalUrl + Date.now().toString() + attempts, 10);
          shortUrl = hash.replace(/[^a-zA-Z0-9]/g, "").substring(0, 10);
          const existing = await UrlDAL.findOneBy({ shortUrl });
          if (!existing) isUnique = true;
@@ -24,8 +27,8 @@ const createUrlService: ServiceWithProps<Url, { email: string; originalUrl: stri
       if (!isUnique) return { message: "Failed to generate unique short URL", status: 500 };
 
       const url = UrlDAL.create({
-         originalUrl: data.originalUrl,
-         shortUrl: shortUrl,
+         originalUrl,
+         shortUrl,
          userId: user.id,
       });
 
